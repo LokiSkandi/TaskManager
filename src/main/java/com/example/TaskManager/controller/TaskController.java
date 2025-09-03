@@ -1,10 +1,12 @@
 package com.example.TaskManager.controller;
 
 import com.example.TaskManager.castomException.NotFoundIdException;
+import com.example.TaskManager.dto.TaskDto;
 import com.example.TaskManager.entity.Task;
 import com.example.TaskManager.event.AuditEvent;
 import com.example.TaskManager.repository.TaskRepository;
 import com.example.TaskManager.service.KafkaAuditService;
+import com.example.TaskManager.service.taskServise.TaskService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -24,29 +26,26 @@ import java.time.LocalDateTime;
 @RestController
 public class TaskController {
     @Autowired
-    private TaskRepository rep;
+    private TaskService taskService;
     @Autowired
     private KafkaAuditService kafkaAuditService;
 
     @Operation(summary = "Получение всех задач")
     @GetMapping
-    public Page<Task> getAllTasks(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
-        return rep.findAll(PageRequest.of(page, size, Sort.by("id")));
+    public Page<TaskDto> getAllTasks(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+        return taskService.getAllTasks(page, size);
     }
 
     @Operation(summary = "Получение всех задач c completed==true")
     @GetMapping("/true")
-    public Page<Task> getAllCompletedTrueTasks(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
-        return rep.findByCompletedTrue(PageRequest.of(page, size, Sort.by("name")));
+    public Page<TaskDto> getAllCompletedTrueTasks(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+        return taskService.getAllCompletedTrueTasks(page, size);
     }
 
     @Operation(summary = "Добавление задач")
     @PostMapping
-    public Task createTask(@Valid @RequestBody Task task) {
-        Task taskOld = rep.save(task);
-        AuditEvent auditEvent = new AuditEvent("task-service", "CREATE", "TASK", task.getId(), LocalDateTime.now());
-        kafkaAuditService.sendAuditEvent(auditEvent);
-        return rep.save(task);
+    public TaskDto createTask(@Valid @RequestBody TaskDto taskDto) {
+        return taskService.createTask(taskDto);
     }
 
     @Operation(summary = "Получение задач по ID")
@@ -55,27 +54,19 @@ public class TaskController {
             @ApiResponse(responseCode = "200", description = "Задача найдена"),
             @ApiResponse(responseCode = "404", description = "Задача не найдена :с")
     })
-    public Task getById (@PathVariable Long id) throws NotFoundIdException {
-        return rep.findById(id).orElseThrow(() -> new NotFoundIdException("Нет данных по ID " + id));
+    public TaskDto getById (@PathVariable Long id) throws NotFoundIdException {
+        return taskService.getById(id);
     }
 
     @Operation(summary = "Удаление задачи по ID")
     @DeleteMapping("/{id}")
     public void deleteById (@Parameter(description = "ID задачи", example = "1") @PathVariable Long id)  throws NotFoundIdException {
-        if(id == null) {
-            throw new NotFoundIdException("Нет данных по ID " + id);
-        }
-        rep.deleteById(id);
+        taskService.deleteById(id);
     }
 
     @Operation(summary = "Изменение задачи по ID")
     @PutMapping("/{id}")
-    public Task putById (@PathVariable Long id, @Valid @RequestBody Task newTask) throws NotFoundIdException{
-        Task oldTask = rep.findById(id).orElseThrow(() -> new NotFoundIdException("Нет данных по ID " + id));
-        oldTask.setTitle(newTask.getTitle());
-        oldTask.setDescription(newTask.getDescription());
-        oldTask.setCompleted(newTask.isCompleted());
-        Task upTask = createTask(oldTask);
-        return upTask;
+    public TaskDto putById (@PathVariable Long id, @Valid @RequestBody TaskDto newTaskDto) throws NotFoundIdException{
+        return taskService.putById(id, newTaskDto);
     }
 }
