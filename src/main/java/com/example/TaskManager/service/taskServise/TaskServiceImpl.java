@@ -31,14 +31,8 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public Page<TaskDto> getAllTasks(int page, int size, Boolean completed) {
-        if(completed != null) {
             return taskRepository.findByCompleted(completed,PageRequest.of(page, size))
                     .map(taskMapper::toDto);
-        }
-        else {
-            return taskRepository.findAll(PageRequest.of(page, size))
-                    .map(taskMapper::toDto);
-        }
     }
 
     @Override

@@ -26,8 +26,8 @@ public class TaskController {
 
     @Operation(summary = "Получение всех задач")
     @GetMapping
-    public Page<TaskDto> getAllTasks(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(required = false) Boolean coompleted) {
-        return taskService.getAllTasks(page, size, coompleted);
+    public Page<TaskDto> getAllTasks(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(required = false) Boolean completed) {
+        return taskService.getAllTasks(page, size, completed);
     }
 
     @Operation(summary = "Добавление задач")

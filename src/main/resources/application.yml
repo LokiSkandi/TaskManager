@@ -12,3 +12,7 @@ spring:
   kafka:
     topic:
       audit-events: audit-events
+jwt:
+  expiration:
+    ms: 900000
+  secret: dGhpcyBpcyBhIHN1cGVyIHNlY3VyZSAyNTYgYml0cyBrZXkgZm9yIEhTMjU2IQ==
