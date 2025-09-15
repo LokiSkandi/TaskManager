@@ -12,5 +12,7 @@ import org.springframework.stereotype.Repository;
 public interface TaskRepository extends JpaRepository<Task, Long> {
     Page<Task> findAll (Pageable pageable);
 
+    Page<Task> findByCompleted(Boolean completed, Pageable pageable);
+
     Page<Task> findByCompletedTrue(Pageable pageable);
 }

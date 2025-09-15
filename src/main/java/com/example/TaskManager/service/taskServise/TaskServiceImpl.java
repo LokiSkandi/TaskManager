@@ -17,28 +17,28 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
-public class TaskServiceImp implements TaskService {
+public class TaskServiceImpl implements TaskService {
 
     private TaskRepository taskRepository;
     private TaskMapper taskMapper;
     private KafkaAuditService kafkaAuditService;
 
-    public TaskServiceImp(TaskRepository taskRepository, TaskMapper taskMapper, KafkaAuditService kafkaAuditService) {
+    public TaskServiceImpl(TaskRepository taskRepository, TaskMapper taskMapper, KafkaAuditService kafkaAuditService) {
         this.taskRepository = taskRepository;
         this.taskMapper = taskMapper;
         this.kafkaAuditService = kafkaAuditService;
     }
 
     @Override
-    public Page<TaskDto> getAllTasks(int page, int size) {
-        return taskRepository.findAll(PageRequest.of(page, size, Sort.by("id")))
-                .map(taskMapper::toDto);
-    }
-
-    @Override
-    public Page<TaskDto> getAllCompletedTrueTasks(int page, int size) {
-        return taskRepository.findByCompletedTrue(PageRequest.of(page, size, Sort.by("id")))
-                .map(taskMapper::toDto);
+    public Page<TaskDto> getAllTasks(int page, int size, Boolean completed) {
+        if(completed != null) {
+            return taskRepository.findByCompleted(completed,PageRequest.of(page, size))
+                    .map(taskMapper::toDto);
+        }
+        else {
+            return taskRepository.findAll(PageRequest.of(page, size))
+                    .map(taskMapper::toDto);
+        }
     }
 
     @Override

@@ -19,6 +19,15 @@ public class Task {
     @NotBlank(message = "Заполните поле! Поле не может быть пустым!")
     private String description;
     private boolean completed;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+
+
+    public User getUser() {
+        return user;
+    }
 
     public void setId(Long id) {
         this.id = id;

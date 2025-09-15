@@ -1,6 +1,7 @@
 package com.example.TaskManager.hendler;
 
 import com.example.TaskManager.castomException.NotFoundIdException;
+import com.example.TaskManager.castomException.NotFoundUsernameException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -23,6 +24,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NotFoundIdException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ResponseEntity<ApiError> handleIdExceptions(NotFoundIdException ex) {
+        ApiError apiError = new ApiError(ex.getMessage(), HttpStatus.NOT_FOUND, LocalDateTime.now());
+        return new ResponseEntity<>(apiError, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(NotFoundIdException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ResponseEntity<ApiError> handleUsernameExceptions(NotFoundUsernameException ex) {
         ApiError apiError = new ApiError(ex.getMessage(), HttpStatus.NOT_FOUND, LocalDateTime.now());
         return new ResponseEntity<>(apiError, HttpStatus.NOT_FOUND);
     }

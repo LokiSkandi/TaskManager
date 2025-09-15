@@ -2,9 +2,6 @@ package com.example.TaskManager.controller;
 
 import com.example.TaskManager.castomException.NotFoundIdException;
 import com.example.TaskManager.dto.TaskDto;
-import com.example.TaskManager.entity.Task;
-import com.example.TaskManager.event.AuditEvent;
-import com.example.TaskManager.repository.TaskRepository;
 import com.example.TaskManager.service.KafkaAuditService;
 import com.example.TaskManager.service.taskServise.TaskService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,11 +12,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 
 @RequestMapping("/api/tasks")
 @Tag(name = "Task API", description = "Управление задачами")
@@ -32,14 +26,8 @@ public class TaskController {
 
     @Operation(summary = "Получение всех задач")
     @GetMapping
-    public Page<TaskDto> getAllTasks(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
-        return taskService.getAllTasks(page, size);
-    }
-
-    @Operation(summary = "Получение всех задач c completed==true")
-    @GetMapping("/true")
-    public Page<TaskDto> getAllCompletedTrueTasks(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
-        return taskService.getAllCompletedTrueTasks(page, size);
+    public Page<TaskDto> getAllTasks(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(required = false) Boolean coompleted) {
+        return taskService.getAllTasks(page, size, coompleted);
     }
 
     @Operation(summary = "Добавление задач")
